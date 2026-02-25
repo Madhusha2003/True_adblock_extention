@@ -1,0 +1,13 @@
+[BLOCKED] Standard Ad | Feat: 300,250,1,0,1 -> p(Ad): 99.00%
+[BLOCKED] Large Ad | Feat: 728,90,1,0,1 -> p(Ad): 98.00%
+[BLOCKED] Sidebar Ad | Feat: 160,600,1,0,1 -> p(Ad): 100.00%
+[ALLOWED] Normal Paragraph | Feat: 800,100,0,0,0 -> p(Ad): 38.50%
+[ALLOWED] Normal Header | Feat: 1200,80,5,0,0 -> p(Ad): 1.50%
+[ALLOWED] Huge Main Article Area | Feat: 800,3000,25,0,0 -> p(Ad): 0.00%
+[ALLOWED] Small Span | Feat: 50,20,0,0,0 -> p(Ad): 7.50%
+[ALLOWED] Square div (small) | Feat: 200,200,0,0,0 -> p(Ad): 36.50%
+[ALLOWED] Square div (medium) | Feat: 400,400,2,0,0 -> p(Ad): 5.00%
+[ALLOWED] Square div (large) | Feat: 800,800,10,0,0 -> p(Ad): 0.00%
+[ALLOWED] Div with many links | Feat: 600,200,50,0,0 -> p(Ad): 0.00%
+[ALLOWED] Div with 1 link | Feat: 600,200,1,0,0 -> p(Ad): 8.00%
+[BLOCKED] YouTube Embed | Feat: 560,315,0,1,0 -> p(Ad): 83.50%

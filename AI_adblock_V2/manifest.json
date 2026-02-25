@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "True AI Ad Blocker",
+    "version": "4.0",
+    "description": "A custom-built AI ad blocker trained on 1,000+ data points using Python.",
+    "author": "MadNir",
+    "icons": {
+        "128": "icons/icon128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "model_logic.js",
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ]
+}
