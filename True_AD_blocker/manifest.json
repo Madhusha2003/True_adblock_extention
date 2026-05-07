@@ -1,15 +1,14 @@
 {
     "manifest_version": 3,
-    "name": "True AD blocker",
-    "version": "5.1",
-    "description": "High-performance rule-based ad blocker with advanced scriptlet protections.",
+    "name": "True AD Blocker",
+    "version": "6.0",
+    "description": "Simple and high-performance ad blocker with custom site blocking.",
     "author": "MadNir",
     "icons": {
         "128": "icons/icon128.png"
     },
     "permissions": [
         "declarativeNetRequest",
-        "declarativeNetRequestFeedback",
         "storage"
     ],
     "host_permissions": [
@@ -17,7 +16,7 @@
     ],
     "action": {
         "default_popup": "popup.html",
-        "default_title": "True AI Ad Blocker"
+        "default_title": "True AD Blocker"
     },
     "options_page": "options.html",
     "background": {
@@ -41,16 +40,6 @@
                 "content.js"
             ],
             "run_at": "document_idle"
-        },
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "scriptlet.js"
-            ],
-            "run_at": "document_start",
-            "world": "MAIN"
         }
     ]
 }

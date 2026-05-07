@@ -1,34 +1,59 @@
-// Background script for True AI Hybrid Ad Blocker
-console.log('[AI Adblock] Background service worker initialized.');
+// Background script for True AD Blocker
+console.log('[True AD Blocker] Background service worker initialized.');
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[AI Adblock] Extension installed/updated.');
-  // Ensure default state is enabled
-  chrome.storage.local.set({ enabled: true });
+  console.log('[True AD Blocker] Extension installed/updated.');
+  chrome.storage.local.set({ enabled: true, blockedSites: [] });
+  syncRules();
 });
 
-// Listen for enabled state changes to toggle DNR rules
+// Sync rules on startup and when storage changes
 chrome.storage.onChanged.addListener((changes) => {
-    // 1. Global Enable/Disable
-    if (changes.enabled) {
-        const isEnabled = changes.enabled.newValue;
-        chrome.declarativeNetRequest.updateEnabledRulesets({
-            [isEnabled ? 'enableRulesetIds' : 'disableRulesetIds']: ['ruleset_1']
-        });
-    }
-    
-    // 2. Rule Mode Enable/Disable
-    if (changes.ruleEnabled) {
-        const isRuleEnabled = changes.ruleEnabled.newValue;
-        chrome.declarativeNetRequest.updateEnabledRulesets({
-            [isRuleEnabled ? 'enableRulesetIds' : 'disableRulesetIds']: ['ruleset_1']
-        });
+    if (changes.enabled || changes.blockedSites) {
+        syncRules();
     }
 });
+
+async function syncRules() {
+    const data = await chrome.storage.local.get({ enabled: true, blockedSites: [] });
+    
+    // 1. Handle Global Static Ruleset
+    await chrome.declarativeNetRequest.updateEnabledRulesets({
+        [data.enabled ? 'enableRulesetIds' : 'disableRulesetIds']: ['ruleset_1']
+    });
+
+    // 2. Handle Custom Blocked Sites (Dynamic Rules)
+    const currentRules = await chrome.declarativeNetRequest.getDynamicRules();
+    const currentRuleIds = currentRules.map(rule => rule.id);
+
+    const newRules = [];
+    if (data.enabled) {
+        data.blockedSites.forEach((domain, index) => {
+            newRules.push({
+                id: 10000 + index,
+                priority: 1,
+                action: { type: 'block' },
+                condition: {
+                    urlFilter: `*://${domain}/*`,
+                    resourceTypes: ['main_frame', 'sub_frame', 'script', 'image', 'xmlhttprequest', 'ping']
+                }
+            });
+        });
+    }
+
+    await chrome.declarativeNetRequest.updateDynamicRules({
+        removeRuleIds: currentRuleIds,
+        addRules: newRules
+    });
+
+    console.log(`[True AD Blocker] Rules synced. Enabled: ${data.enabled}, Custom Sites: ${data.blockedSites.length}`);
+}
+
+// Initial sync
+syncRules();
+
+// Debugging: Track blocked requests
 chrome.declarativeNetRequest.onRuleMatchedDebug?.addListener((info) => {
-  console.log('[AI Adblock] Blocked request:', info.request.url);
-  
-  // Update Global Stats
   chrome.storage.local.get('blockedCount', (data) => {
       const count = (data.blockedCount || 0) + 1;
       chrome.storage.local.set({ blockedCount: count });
