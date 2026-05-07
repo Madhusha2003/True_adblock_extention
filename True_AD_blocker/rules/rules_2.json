@@ -1,0 +1,13 @@
+[
+    {
+        "id": 66241,
+        "priority": 2,
+        "action": {
+            "type": "allow"
+        },
+        "condition": {
+            "urlFilter": "||milfzr.com^",
+            "isUrlFilterCaseSensitive": false
+        }
+    }
+]

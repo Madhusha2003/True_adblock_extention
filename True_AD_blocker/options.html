@@ -228,10 +228,25 @@
             </ul>
         </div>
 
+        <div class="card">
+            <div class="card-title">Advanced Rules (Professional)</div>
+            <div class="card-desc">Import custom filter lists or DNR rules. All rules are validated for safety before activation.</div>
+            
+            <div style="margin-top: 24px;">
+                <textarea id="advanced-rules-input" placeholder="Paste domains or DNR JSON rules here..." 
+                    style="width: 100%; height: 120px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: white; font-family: monospace; font-size: 13px; outline: none; margin-bottom: 12px; box-sizing: border-box;"></textarea>
+                <button id="import-btn" style="width: 100%; margin-bottom: 8px;">Import & Validate Rules</button>
+                <button id="export-json-btn" style="width: 100%; margin-bottom: 8px; background: #1e293b; border: 1px solid var(--primary);">Export to rules.json</button>
+                <button id="reset-rules-btn" style="width: 100%; background: transparent; border: 1px solid var(--danger); color: var(--danger);">Reset All Custom Rules</button>
+            </div>
+            <div id="import-status" style="margin-top: 12px; font-size: 13px; color: var(--text-dim);"></div>
+        </div>
+
         <footer>
             True AD Blocker &copy; 2026. Optimized for speed and privacy.
         </footer>
     </div>
+    <script src="rule_parser.js"></script>
     <script src="options.js"></script>
 </body>
 </html>

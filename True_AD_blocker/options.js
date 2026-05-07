@@ -86,4 +86,104 @@ document.addEventListener('DOMContentLoaded', async () => {
         const regex = /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i;
         return regex.test(domain);
     }
+
+    // Advanced Import Logic
+    const importBtn = document.getElementById('import-btn');
+    const importInput = document.getElementById('advanced-rules-input');
+    const importStatus = document.getElementById('import-status');
+
+    importBtn.addEventListener('click', async () => {
+        const rawInput = importInput.value.trim();
+        if (!rawInput) return;
+
+        importStatus.textContent = 'Parsing and validating rules...';
+        importStatus.style.color = 'var(--text-dim)';
+
+        try {
+            // Professional Parsing
+            const { networkRules, cosmeticRules } = RuleParser.processList(rawInput);
+
+            if (networkRules.length > 0 || cosmeticRules.length > 0) {
+                chrome.storage.local.get({ customNetworkRules: [], customCosmeticRules: [] }, (data) => {
+                    // Safety Cap: Professional blockers often limit custom rules to prevent browser lag
+                    // We'll cap at 10,000 for high-performance balance
+                    const updatedNetwork = [...data.customNetworkRules, ...networkRules].slice(0, 10000);
+                    const updatedCosmetic = [...data.customCosmeticRules, ...cosmeticRules].slice(0, 5000);
+                    
+                    chrome.storage.local.set({ 
+                        customNetworkRules: updatedNetwork,
+                        customCosmeticRules: updatedCosmetic 
+                    }, () => {
+                        importInput.value = '';
+                        importStatus.textContent = `Import complete: ${networkRules.length} rules added (Capped at 10k total).`;
+                        importStatus.style.color = '#10b981';
+                        chrome.runtime.sendMessage({ action: 'sync-rules' });
+                    });
+                });
+            } else {
+                importStatus.textContent = 'No valid rules found in input.';
+                importStatus.style.color = 'var(--danger)';
+            }
+        } catch (err) {
+            importStatus.textContent = 'Error during parsing: ' + err.message;
+            importStatus.style.color = 'var(--danger)';
+        }
+    });
+
+    // Professional Export to Static Files
+    const exportBtn = document.getElementById('export-json-btn');
+    exportBtn.addEventListener('click', () => {
+        const rawInput = importInput.value.trim();
+        if (!rawInput) {
+            alert('Please paste some rules into the box first to generate files.');
+            return;
+        }
+
+        importStatus.textContent = 'Generating static files...';
+        
+        try {
+            const { networkRules, cosmeticRules } = RuleParser.processList(rawInput, 1);
+            
+            // 1. Export Network Rules (rules.json)
+            downloadFile(JSON.stringify(networkRules, null, 2), 'rules.json');
+            
+            // 2. Export Cosmetic Rules (cosmetic_rules.json)
+            downloadFile(JSON.stringify(cosmeticRules, null, 2), 'cosmetic_rules.json');
+            
+            importStatus.textContent = `Generated rules.json (${networkRules.length} rules) and cosmetic_rules.json (${cosmeticRules.length} rules). Save both to your "rules/" folder.`;
+            importStatus.style.color = '#10b981';
+        } catch (err) {
+            importStatus.textContent = 'Export failed: ' + err.message;
+            importStatus.style.color = 'var(--danger)';
+        }
+    });
+
+    function downloadFile(content, fileName) {
+        const blob = new Blob([content], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // Reset All Custom Rules
+    const resetBtn = document.getElementById('reset-rules-btn');
+    resetBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all custom rules and EasyList data?')) {
+            chrome.storage.local.set({ 
+                customNetworkRules: [], 
+                customCosmeticRules: [],
+                blockedSites: [] 
+            }, () => {
+                renderBlockList([]);
+                importStatus.textContent = 'All custom rules have been cleared.';
+                importStatus.style.color = 'var(--text-dim)';
+                chrome.runtime.sendMessage({ action: 'sync-rules' });
+            });
+        }
+    });
 });
